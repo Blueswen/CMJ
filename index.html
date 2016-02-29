@@ -19,8 +19,208 @@
   </head>
   <body>
     <input type="file" id="fileinput" name="name" value="">
+    <button id="loadExample" type="button" name="button">Load Example Data</button>
+    <button id="quicktest" type="button" name="button">quicktest</button>
+    <table id="sourceTable" class="display" cellspacing="0" width="100%">
+    </table>
+    <div class="row">
+      <div class="col-md-6">
+        <label for="objectIndi">目標指標</label>
+        <select id="objectIndi">
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="timeIndi">時間指標</label>
+        <select id="timeIndi">
+        </select>
+      </div>
+    </div>
+    <div data-intro='你可以在這裡選擇想要關注的焦點城市。' data-setp='1'>
+      <label for="targetObject">焦點目標</label>
+      <select id="targetObject" class="objectselect">
+      </select>
+    </div>
+    <div data-intro='你可以在這裡選擇在分析時要排除的城市。' data-setp='2'>
+      <label for="exObject">排除目標</label>
+      <select id="exObject" class="objectselect">
+      </select>
+    </div>
+    <div data-intro='你可以在這裡選擇想要想要分析的指標的時間。' data-setp='3'>
+      <label for="timeselect">時間</label>
+      <select id="timeselect">
+      </select>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="panel panel-default" data-intro='你可以在這裡選擇要設定為資源指標的指標，每個指標後面會顯示該指標具有資料的時間範圍。' data-setp='5'>
+          <div class="panel-heading">資源指標<button id="addResource" type="button" name="button">Add</button></div>
+          <div class="panel-body" id="resource">
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="panel panel-default" data-intro='你可以在這裡選擇要設定為資源指標的指標，每個指標後面會顯示該指標具有資料的時間範圍。' data-setp='5'>
+          <div class="panel-heading">市場指標<button id="addMarket" type="button" name="button">Add</button></div>
+          <div class="panel-body" id="market">
+          </div>
+        </div>
+      </div>
+    </div>
+    <button id="getData" type="button" name="button">Getdata</button>
+    <table id="resultTable" class="display" cellspacing="0" width="100%">
+    </table>
+    <div id="chart">
+      <svg></svg>
+    </div>
   </body>
   <script type="text/javascript">
+    var comdata = {
+      targetObject: null,
+      selectIndi: {
+        indiList: [],
+        objectIndi: null,
+        objectList: [],
+        timeIndi: null,
+        timeList: [],
+        market:0,
+        resource:0
+      },
+      Mpa: 0,
+      Rpa: 0,
+      values: [],
+      result: [],
+      resultTable: []
+    };;
+    var orgdata = [];
+    var formatdata;
+    var done = false;
+
+    $("#loadExample").click(function(){
+      $.ajax({
+        type: "GET",
+        url: "CMJ.csv",
+        dataType: "text",
+        success: function(data) {load_dataset(data);}
+      });
+    });
+    $("#addMarket").click(function(){
+      addIndicator("market");
+    });
+    $("#addResource").click(function(){
+      addIndicator("resource");
+    });
+    $("#getData").click(function(){
+      var indiname = [comdata.selectIndi.objectIndi, "market", "resource"];
+      var mcount = comdata.selectIndi.market;
+      var rcount = comdata.selectIndi.resource;
+      for (var i = 0; i < mcount; i++) {
+        var curindi = $('#m' + i + ' .indiselect').val();
+        var curweight = $('#m' + i + ' .weight').val();
+        indiname.push( "市場:" + curindi );
+
+        comdata.values.push({
+          type: "market",
+          indicator: curindi,
+          weight: curweight,
+          values: [],
+          pai: 0,
+          pi: 0
+        });
+      }
+
+      for (var i = 0; i < rcount; i++) {
+        var curindi = $('#r' + i + ' .indiselect').val();
+        var curweight = $('#r' + i + ' .weight').val();
+        indiname.push( "資源:" + curindi );
+
+        comdata.values.push({
+          type: "resource",
+          indicator: curindi,
+          weight: curweight,
+          values: [],
+          pai: 0,
+          pi: 0
+        });
+      }
+
+      comdata.targetObject = $('#targetObject').val();
+      formatdata = [];
+      orgdata.forEach(function(d){
+        comdata.selectIndi.indiList.forEach(function(e){
+          if ( e.item == comdata.selectIndi.objectIndi || e.item == comdata.selectIndi.timeIndi ){
+          }
+          else{
+            var current = {};
+            current.value = d[e.item];
+            current.indicator = e.item;
+            current[comdata.selectIndi.objectIndi] = d[comdata.selectIndi.objectIndi];
+            current[comdata.selectIndi.timeIndi] = d[comdata.selectIndi.timeIndi];
+            formatdata.push(current);
+          }
+        });
+      });
+      formatdata = formatdata.filter(function(d){
+        return d.Year == 2009;
+      });
+
+      initResultDatatable("resultTable", indiname);
+      calComAna(formatdata, comdata.selectIndi.objectIndi);
+    });
+
+    $("#quicktest").click(function(){
+      async.waterfall([
+        function(callback) {
+          $("#loadExample").click();
+          setTimeout(function(){ callback(null); }, 500);
+        },
+        function(callback) {
+          $('#objectIndi option').val("NAME");
+          setTimeout(function(){ callback(null); }, 500);
+        },
+        function(callback) {
+          $("#objectIndi option").change();
+          setTimeout(function(){ callback(null); }, 500);
+        },
+        function(callback) {
+          $('#timeIndi option').val("Year");
+          setTimeout(function(){ callback(null); }, 500);
+        },
+        function(callback) {
+          $("#timeIndi option").change();
+          setTimeout(function(){ callback(null); }, 500);
+        },
+        function(callback) {
+          $('#targetObject option').val("TWN");
+          setTimeout(function(){ callback(null); }, 500);
+        },
+        function(callback) {
+          for (var i = 0; i < 3; i++) {
+            $("#addMarket").click();
+          }
+          callback(null);
+        },
+        function(callback) {
+          for (var i = 0; i < 3; i++) {
+            $("#addResource").click();
+          }
+          callback(null);
+        },
+        function(callback) {
+          $('#m' + 0 + ' .indiselect option').val("STKTRS ");
+          $('#m' + 1 + ' .indiselect option').val("STKMKT ");
+          $('#m' + 2 + ' .indiselect option').val(" Bonds");
+          $('#r' + 0 + ' .indiselect option').val("DirInvest");
+          $('#r' + 1 + ' .indiselect option').val("NI");
+          $('#r' + 2 + ' .indiselect option').val("IPO ");
+          callback(null);
+        },
+        function(callback) {
+          $("#getData").click();
+          callback(null);
+        }
+      ]);
+
+    });
 
     upload_button("fileinput", load_dataset);
 
@@ -52,14 +252,426 @@
         });
         return current;
       });
-      foo(cd);
+      foo(cleandata);
     }
 
+    function initDatatable( tableId, keylist ) {
+      $( '#' + tableId ).append('<thead><tr></tr></thead>');
+      $( '#' + tableId ).append('<tfood><tr></tr></tfood>');
+      keylist.forEach(function ( k, i ) {
+        $( '#' + tableId + ' thead tr').append("<th>" + k + "</th>");
+        $( '#' + tableId + ' tfood tr').append("<th>" + k + "</th>");
+      });
+      var columns = keylist.map(function (x) { return {"mDataProp":x}; });
+      oTable = $( '#' + tableId ).dataTable({
+        "aoColumns": columns
+      });
+    }
 
+    function loadDatatable( tableId, data ){
+      // load datatable
+      $( '#' + tableId ).dataTable().fnClearTable();
+      $( '#' + tableId ).dataTable().fnAddData(data);
+    }
 
     function foo(data) {
-      console.log(data);
+      initDatatable("sourceTable", Object.keys(data[0]));
+      loadDatatable("sourceTable",data);
+      orgdata = data;
+
+      // build indicator list
+      items = Object.keys(data[0]).map(function(k){
+        return { item : k };
+      });
+      comdata.selectIndi.indiList = items;
+
+      // initial target object and exObject when objectindi chanege
+      $('#objectIndi').on('change',function(){
+        // update comdata
+        comdata.selectIndi.objectIndi = $(this).val();
+        comdata.selectIndi.objectList = [];
+        data.forEach(function(d) {
+          if( comdata.selectIndi.objectList.indexOf( d[comdata.selectIndi.objectIndi] ) == -1 ){
+            comdata.selectIndi.objectList.push( d[comdata.selectIndi.objectIndi] );
+          }
+        });
+
+        // initial targetObject selectize
+        $('#targetObject').selectize({
+          delimiter: ',',
+          persist: false,
+          options: comdata.selectIndi.objectList.map( function(d){ return { item: d }; }),
+          searchField: ['item'],
+          labelField: "item",
+          valueField: "item",
+          render: {
+            option: function(data, escape) {
+              return '<div class="option">'+ escape(data.item) + '</div>';
+            }
+          }
+        });
+
+        //  initial exObject selectize
+        $('#exObject').attr("multiple","1");
+        $('#exObject').selectize({
+          delimiter: ',',
+          persist: false,
+          options: comdata.selectIndi.objectList.map( function(d){ return { item: d }; }),
+          searchField: ['item'],
+          labelField: "item",
+          valueField: "item",
+          render: {
+            option: function(data, escape) {
+              return '<div class="option">'+ escape(data.item) + '</div>';
+            }
+          }
+        });
+      });
+
+      // initial time when timeindi chanege
+      $('#timeIndi').on('change',function(){
+        // update comdata
+        comdata.selectIndi.timeIndi = $(this).val();
+        comdata.selectIndi.timeList = [];
+        data.forEach(function(d) {
+          if( comdata.selectIndi.timeList.indexOf( d[comdata.selectIndi.timeIndi] ) == -1 ){
+            comdata.selectIndi.timeList.push( d[comdata.selectIndi.timeIndi] );
+          }
+        });
+
+        // initial time selectize
+        $('#timeselect').selectize({
+          delimiter: ',',
+          persist: false,
+          options: comdata.selectIndi.timeList.map( function(d){ return { item: d }; }),
+          searchField: ['item'],
+          labelField: "item",
+          valueField: "item",
+          render: {
+            option: function(data, escape) {
+              return '<div class="option">'+ escape(data.item) + '</div>';
+            }
+          }
+        });
+      });
+
+      // inital object indicator selectize
+      $('#objectIndi').selectize({
+        delimiter: ',',
+        persist: false,
+        options: items,
+        searchField: ['item'],
+        labelField: "item",
+        valueField: "item",
+        render: {
+          option: function(data, escape) {
+            return '<div class="option">'+ escape(data.item) + '</div>';
+          }
+        }
+      });
+
+      // initial time indicator selectize
+      $('#timeIndi').selectize({
+        delimiter: ',',
+        persist: false,
+        options: items,
+        searchField: ['item'],
+        labelField: "item",
+        valueField: "item",
+        render: {
+          option: function(data, escape) {
+            return '<div class="option">'+ escape(data.item) + '</div>';
+          }
+        }
+      });
     }
 
+    function addIndicator( type ) {
+      switch (type) {
+        case "market":
+          $("#" + type).append( generateIndiSelect( "m"+ comdata.selectIndi.market ) );
+          $("#m" + comdata.selectIndi.market + " .indiselect").selectize({
+            delimiter: ',',
+            persist: false,
+            options: comdata.selectIndi.indiList.filter(function(i) {
+              return i.item != comdata.selectIndi.objectIndi && i.item != comdata.selectIndi.timeIndi;
+            }),
+            searchField: ['item'],
+            labelField: "item",
+            valueField: "item",
+            render: {
+              option: function(data, escape) {
+                return '<div class="option">'+ escape(data.item) + '</div>';
+              }
+            }
+          });
+          break;
+        case "resource":
+          $("#" + type).append( generateIndiSelect( "r"+ comdata.selectIndi.resource ) );
+          $("#r" + comdata.selectIndi.resource + " .indiselect").selectize({
+            delimiter: ',',
+            persist: false,
+            options: comdata.selectIndi.indiList.filter(function(i) {
+              return i.item != comdata.selectIndi.objectIndi && i.item != comdata.selectIndi.timeIndi;
+            }),
+            searchField: ['item'],
+            labelField: "item",
+            valueField: "item",
+            render: {
+              option: function(data, escape) {
+                return '<div class="option">'+ escape(data.item) + '</div>';
+              }
+            }
+          });
+          break;
+        default:
+          console.log("error type : " + type);
+          return null;
+      }
+      comdata.selectIndi[type]++;
+    }
+
+    function generateIndiSelect( id ){
+        return "<div class='panel panel-default' id=" + id + "> <div class='panel-body'> <div class='col-md-9'> <label for=''>指標</label> <select class='indiselect'> </select> </div><div class='col-md-3'><label for=''>權重</label><div><input class='weight' type='text' name='weight' value='1' max='1' min='0'></div></div></div></div>";
+    }
+
+    function calComAna( rawdata, objectIndi ) {
+      async.waterfall([
+        function(callback){
+          var quit = false;
+          var values =[];
+          rawdata.forEach(function(d) {
+            var i;
+            for (i = 0; i < values.length; i++) {
+              if (values[i][objectIndi] == d[objectIndi]) {
+                if( !isNaN( d.value ) ){
+                  values[i][d.indicator] = d.value;
+                }
+                else {
+                  values[i][d.indicator] = "N/A";
+                  quit = true;
+                }
+                break;
+              }
+            }
+            if ( i == values.length ) {
+              var current = {};
+              current[objectIndi] = d[objectIndi];
+              if ( !isNaN( d.value ) ) {
+                current[d.indicator] = d.value;
+              }
+              else {
+                current[d.indicator] = "N/A";
+                quit = true;
+              }
+              values.push(current);
+            }
+          });
+          comdata.resultTable = values;
+
+          //remove old chart
+          $('#chart').html("<svg></svg>");
+
+          // deal with error cmj
+          if (quit) {
+            alert("資料有缺漏無法進行競爭者分析，請重新選擇。");
+            return null;
+          }
+          callback(null,rawdata);
+        },
+        function(rawdata, callback) {
+          rawdata.forEach(function(d){
+            for (var i = 0; i < comdata.values.length; i++) {
+              if (d.indicator==comdata.values[i].indicator) {
+                comdata.values[i].values.push(d);
+                continue;
+              }
+            }
+          });
+          callback(null);
+        },
+        function(callback) {
+          comdata.values.forEach(function(e){
+            e.values.forEach(function(d) {
+              //Compute Mpa, Rpa, Pai
+              if( d[objectIndi] == comdata.targetObject ) {
+                switch( e.type ){
+                case "market":
+                  e.pai = d.value;
+                  comdata.Mpa += d.value;
+                  break;
+                case "resource":
+                  e.pai = d.value;
+                  comdata.Rpa += d.value;
+                  break;
+                default:
+                  console.log("Comdata values type doesn't match",e);
+                }
+              }
+              //Compute pi
+              e.pi += d.value;
+            });
+          });
+          callback(null);
+        },
+        function(callback) {
+          //Compute Mab & Rab
+          comdata.values.forEach(function(e) {
+            e.values.forEach(function(d) {
+              switch( e.type ){
+              case "market":
+                d.ab = ( e.pai / comdata.Mpa ) * ( d.value / e.pi );
+                break;
+              case "resource":
+                d.ab = ( e.pai / comdata.Rpa ) * ( d.value / e.pi );
+                break;
+              default:
+                console.log("Comdata values type doesn't match",e);
+              }
+            });
+          });
+          callback(null);
+        },
+        function(callback) {
+          comdata.values.forEach(function(e) {
+            e.values.forEach(function(d) {
+              switch( e.type ){
+              case "market":
+                var i = 0;
+                for( i = 0 ; i < comdata.result.length ; i++ ) {
+                  if ( comdata.result[i][objectIndi] == d[objectIndi] && comdata.result[i].type == "market" ) {
+                    comdata.result[i].value += d.ab*e.weight;
+                    break;
+                  }
+                }
+                if( i == comdata.result.length) {
+                  var current = {};
+                  current[objectIndi] = d[objectIndi];
+                  current.type = "market";
+                  current.value = d.ab*e.weight;
+                  comdata.result.push(current);
+                }
+                break;
+              case "resource":
+                var i = 0;
+                for( i = 0 ; i < comdata.result.length ; i++ ) {
+                  if ( comdata.result[i][objectIndi] == d[objectIndi] && comdata.result[i].type == "resource" ) {
+                    comdata.result[i].value += d.ab*e.weight;
+                    break;
+                  }
+                }
+                if( i == comdata.result.length) {
+                  var current = {};
+                  current[objectIndi] = d[objectIndi];
+                  current.type = "resource";
+                  current.value = d.ab*e.weight;
+                  comdata.result.push(current);
+                }
+                break;
+              default:
+                console.log("Comdata values type doesn't match",e);
+              }
+            });
+          });
+          callback(null);
+        },
+        function(callback) {
+          console.log(comdata);
+          comdata.result.forEach(function(d){
+            comdata.resultTable.forEach(function(e){
+              if( d[comdata.selectIndi.objectIndi] == e[comdata.selectIndi.objectIndi]){
+                e[d.type] = d.value;
+              }
+            })
+          });
+          console.log(comdata.resultTable);
+          $( '#resultTable').dataTable().fnClearTable();
+          $( '#resultTable' ).dataTable().fnAddData(comdata.resultTable);
+          nv.addGraph(function() {
+            var chart = nv.models.scatterChart()
+                          .showDistX(true)
+                          .showDistY(true)
+                          .color(d3.scale.category10().range())
+                          .pointRange([500,500]);
+
+            chart.xAxis.tickFormat(d3.format('.02f'));
+            chart.yAxis.tickFormat(d3.format('.02f'));
+
+            d3.select('#chart svg')
+                .datum(getScatterData(comdata.result, objectIndi, comdata.targetObject))
+              .transition().duration(500)
+                .call(chart);
+
+            nv.utils.windowResize(chart.update);
+
+            return chart;
+          });
+          callback(null);
+        }
+      ]);
+    }
+
+    function getScatterData(data, objectIndi, targetObject){
+      var scatterdata = [];
+      data.forEach(function(d) {
+        if ( d[objectIndi] == targetObject ) {
+          return null;
+        }
+        var i = 0;
+        for( i = 0 ; i < scatterdata.length ; i++ ) {
+          if ( scatterdata[i].key == d[objectIndi] ) {
+            if ( d.type == "market" ) {
+              scatterdata[i].values[0].x = d.value;
+            }
+            else if ( d.type == "resource" ) {
+              scatterdata[i].values[0].y = d.value;
+            }
+            break;
+          }
+        }
+        if( i == scatterdata.length) {
+          var current = {
+            values:[{}],
+            key:d[objectIndi]
+          };
+          if ( d.type == "market" ) {
+            current.values[0].x = d.value;
+          }
+          else if ( d.type == "resource" ) {
+            current.values[0].y = d.value;
+          }
+          scatterdata.push(current);
+        }
+      });
+      return scatterdata;
+    }
+
+    function initResultDatatable( tableId, data ) {
+      if (done) {
+        oTable.fnDestroy();
+        $( '#' + tableId ).html("");
+      }
+      done = true;
+      $( '#' + tableId ).append('<thead><tr></tr></thead>');
+      $( '#' + tableId ).append('<tfood><tr></tr></tfood>');
+      data.forEach(function ( k, i ) {
+        if ( k == "city" ){
+          k = "城市";
+        }
+        $( '#' + tableId + ' thead tr').append("<th>" + k + "</th>");
+        $( '#' + tableId + ' tfood tr').append("<th>" + k + "</th>");
+      });
+      var columns = data.map(function (x) {
+        if (x.indexOf(":")==-1) {
+          return {"mDataProp":x};
+        }
+        else {
+          return {"mDataProp":x.split(":")[1]};
+        }
+       });
+      oTable = $( '#' + tableId ).dataTable({
+        "aoColumns": columns
+      });
+    }
   </script>
 </html>
