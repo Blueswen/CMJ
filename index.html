@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Competitor Analysis</title>
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script type="text/javascript" src="javascripts/selectize.min.js"></script>
+    <link rel="stylesheet" href="stylesheets/selectize.css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" src="http://cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="http://cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css" media="screen" title="no title" charset="utf-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="stylesheets/nv.d3.min.css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" src="javascripts/nv.d3.min.js"></script>
+    <script type="text/javascript" src="javascripts/async.min.js"></script>
+    <script type="text/javascript" src="javascripts/intro.js"></script>
+    <link rel="stylesheet" href="stylesheets/introjs.css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" src="javascripts/csvupload.js"></script>
+  </head>
+  <body>
+    <input type="file" id="fileinput" name="name" value="">
+  </body>
+  <script type="text/javascript">
+
+    upload_button("fileinput", load_dataset);
+
+    // handle upload button
+    function upload_button(el, callback) {
+      var uploader = document.getElementById(el);
+      var reader = new FileReader();
+
+      reader.onload = function(e) {
+        var contents = e.target.result;
+        callback(contents);
+      };
+
+      uploader.addEventListener("change", handleFiles, false);
+
+      function handleFiles() {
+        var file = this.files[0];
+        reader.readAsText(file);
+      };
+    };
+
+    function load_dataset(csv) {
+      var data = d3.csv.parse(csv);
+      var keys = Object.keys(data[0]);
+      var cleandata = data.map(function(d){
+        var current = {};
+        keys.forEach(function(k){
+          current[k] = +d[k] || d[k];
+        });
+        return current;
+      });
+      foo(cd);
+    }
+
+
+
+    function foo(data) {
+      console.log(data);
+    }
+
+  </script>
+</html>
