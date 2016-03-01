@@ -16,6 +16,14 @@
     <script type="text/javascript" src="javascripts/intro.js"></script>
     <link rel="stylesheet" href="stylesheets/introjs.css" media="screen" title="no title" charset="utf-8">
     <script type="text/javascript" src="javascripts/csvupload.js"></script>
+    <style media="screen">
+      #chart svg{
+        height: 400px;
+      }
+      input{
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
     <input type="file" id="fileinput" name="name" value="">
@@ -80,6 +88,7 @@
         indiList: [],
         objectIndi: null,
         objectList: [],
+        exObjectList: [],
         timeIndi: null,
         timeList: [],
         market:0,
@@ -144,6 +153,7 @@
       }
 
       comdata.targetObject = $('#targetObject').val();
+      comdata.selectIndi.exObjectList = $('#exObject').val();
       formatdata = [];
       orgdata.forEach(function(d){
         comdata.selectIndi.indiList.forEach(function(e){
@@ -159,8 +169,20 @@
           }
         });
       });
+
+      // exclude object
       formatdata = formatdata.filter(function(d){
-        return d.Year == 2009;
+        if (comdata.selectIndi.exObjectList) {
+          return comdata.selectIndi.exObjectList.indexOf(d[comdata.selectIndi.objectIndi]) == -1;
+        }
+        else {
+          return true;
+        }
+      });
+
+      // set time
+      formatdata = formatdata.filter(function(d){
+        return d[comdata.selectIndi.timeIndi] == $("#timeselect option").val();
       });
 
       initResultDatatable("resultTable", indiname);
@@ -186,7 +208,11 @@
           setTimeout(function(){ callback(null); }, 500);
         },
         function(callback) {
-          $("#timeIndi option").change();
+          $("#timeIndi option").change();$("#timeselect option").val()
+          setTimeout(function(){ callback(null); }, 500);
+        },
+        function(callback) {
+          $("#timeselect option").val(2008);
           setTimeout(function(){ callback(null); }, 500);
         },
         function(callback) {
