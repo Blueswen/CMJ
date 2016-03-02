@@ -23,64 +23,109 @@
       input{
         width: 100%;
       }
+      .pad20{
+        padding-top: 20px;
+      }
     </style>
   </head>
   <body>
-    <input type="file" id="fileinput" name="name" value="">
-    <button id="loadExample" type="button" name="button">Load Example Data</button>
-    <button id="quicktest" type="button" name="button">quicktest</button>
-    <table id="sourceTable" class="display" cellspacing="0" width="100%">
-    </table>
     <div class="row">
-      <div class="col-md-6">
-        <label for="objectIndi">目標指標</label>
-        <select id="objectIndi">
-        </select>
+      <div class="col-md-2 col-md-offset-2 pad20">
+        <input type="file" id="fileinput" name="name" value="">
       </div>
-      <div class="col-md-6">
-        <label for="timeIndi">時間指標</label>
-        <select id="timeIndi">
-        </select>
+      <div class="col-md-2 pad20">
+        <button class="btn btn-default" id="loadExample" type="button" name="button">Load Example Data</button>
+      </div>
+      <div class="col-md-2 pad20">
+        <button class="btn btn-default" id="quicktest" type="button" name="button">Quick Test</button>
+      </div>
+      <div class="col-md-2 pad20">
+        <button class="btn btn-default" id="quicktest" type="button" name="button">使用說明</button>
       </div>
     </div>
-    <div data-intro='你可以在這裡選擇想要關注的焦點城市。' data-setp='1'>
-      <label for="targetObject">焦點目標</label>
-      <select id="targetObject" class="objectselect">
-      </select>
-    </div>
-    <div data-intro='你可以在這裡選擇在分析時要排除的城市。' data-setp='2'>
-      <label for="exObject">排除目標</label>
-      <select id="exObject" class="objectselect">
-      </select>
-    </div>
-    <div data-intro='你可以在這裡選擇想要想要分析的指標的時間。' data-setp='3'>
-      <label for="timeselect">時間</label>
-      <select id="timeselect">
-      </select>
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        <table id="sourceTable" class="display pad20" cellspacing="0" width="100%">
+        </table>
+      </div>
     </div>
     <div class="row">
-      <div class="col-md-6">
-        <div class="panel panel-default" data-intro='你可以在這裡選擇要設定為資源指標的指標，每個指標後面會顯示該指標具有資料的時間範圍。' data-setp='5'>
-          <div class="panel-heading">資源指標<button id="addResource" type="button" name="button">Add</button></div>
-          <div class="panel-body" id="resource">
-          </div>
+      <div class="col-md-10 col-md-offset-1">
+        <div class="col-md-6 pad20">
+          <label for="objectIndi">目標指標</label>
+          <select id="objectIndi">
+          </select>
         </div>
-      </div>
-      <div class="col-md-6">
-        <div class="panel panel-default" data-intro='你可以在這裡選擇要設定為資源指標的指標，每個指標後面會顯示該指標具有資料的時間範圍。' data-setp='5'>
-          <div class="panel-heading">市場指標<button id="addMarket" type="button" name="button">Add</button></div>
-          <div class="panel-body" id="market">
-          </div>
+        <div class="col-md-6 pad20">
+          <label for="timeIndi">時間指標</label>
+          <select id="timeIndi">
+          </select>
         </div>
       </div>
     </div>
-    <button id="getData" type="button" name="button">Getdata</button>
-    <table id="resultTable" class="display" cellspacing="0" width="100%">
-    </table>
-    <div id="chart">
-      <svg></svg>
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        <div class="col-md-4 pad20" data-intro='你可以在這裡選擇想要關注的焦點城市。' data-setp='1'>
+          <label for="targetObject">焦點目標</label>
+          <select id="targetObject" class="objectselect">
+          </select>
+        </div>
+        <div class="col-md-4 pad20" data-intro='你可以在這裡選擇在分析時要排除的城市。' data-setp='2'>
+          <label for="exObject">排除目標</label>
+          <select id="exObject" class="objectselect">
+          </select>
+        </div>
+        <div class="col-md-4 pad20" data-intro='你可以在這裡選擇想要想要分析的指標的時間。' data-setp='3'>
+          <label for="timeselect">時間</label>
+          <select id="timeselect">
+          </select>
+        </div>
+      </div>
     </div>
-    <a id="download" href="#"  style="display:none"><button type="button" name="button">Download</button></a>
+
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1 pad20">
+        <div class="col-md-6">
+          <div class="panel panel-default" data-intro='你可以在這裡選擇要設定為資源指標的指標，每個指標後面會顯示該指標具有資料的時間範圍。' data-setp='5'>
+            <div class="panel-heading">
+              <span style="font-size:22px">資源指標</span>
+              <button class="btn btn-default" style="float:right" id="addResource" type="button" name="button">Add</button>
+            </div>
+            <div class="panel-body" id="resource">
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="panel panel-default" data-intro='你可以在這裡選擇要設定為資源指標的指標，每個指標後面會顯示該指標具有資料的時間範圍。' data-setp='5'>
+            <div class="panel-heading">
+              <span style="font-size:22px">市場指標</span>
+              <button class="btn btn-default" style="float:right" id="addMarket" type="button" name="button">Add</button>
+            </div>
+            <div class="panel-body" id="market">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row text-center pad20">
+      <button class="btn btn-default" id="getData" type="button" name="button">Getdata</button>
+    </div>
+    <div class="row pad20">
+      <div class="col-md-10 col-md-offset-1">
+        <table id="resultTable" class="display" cellspacing="0" width="100%">
+        </table>
+      </div>
+    </div>
+    <div class="row pad20">
+      <div class="col-md-10 col-md-offset-1">
+        <div id="chart">
+          <svg></svg>
+        </div>
+      </div>
+    </div>
+    <div class="row text-center pad20">
+      <a id="download" href="#" style="display:none"><button class="btn btn-default" type="button" name="button">Download</button></a>
+    </div>
   </body>
   <script type="text/javascript">
     var comdata = {
@@ -105,6 +150,7 @@
     var formatdata;
     var done = false;
     var oTable;
+    var selectizeList = {};
 
     $("#loadExample").click(function(){
       $.ajax({
@@ -205,7 +251,8 @@
           setTimeout(function(){ callback(null); }, 500);
         },
         function(callback) {
-          $('#objectIndi option').val("NAME");
+          // $('#objectIndi option').val("NAME");
+          selectizeList.objectIndi.addItem("NAME");
           setTimeout(function(){ callback(null); }, 500);
         },
         function(callback) {
@@ -213,19 +260,27 @@
           setTimeout(function(){ callback(null); }, 500);
         },
         function(callback) {
-          $('#timeIndi option').val("Year");
+          // $('#timeIndi option').val("Year");
+          selectizeList.timeIndi.addItem("Year");
           setTimeout(function(){ callback(null); }, 500);
         },
         function(callback) {
-          $("#timeIndi option").change();$("#timeselect option").val()
+          $("#timeIndi option").change();
           setTimeout(function(){ callback(null); }, 500);
         },
         function(callback) {
-          $("#timeselect option").val(2008);
+          // $('#targetObject option').val("TWN");
+          selectizeList.targetObject.addItem("TWN");
           setTimeout(function(){ callback(null); }, 500);
         },
         function(callback) {
-          $('#targetObject option').val("TWN");
+          // selectizeList.exObject.addItem("HK");
+          // selectizeList.exObject.addItem("CHN");
+          setTimeout(function(){ callback(null); }, 500);
+        },
+        function(callback) {
+          // $("#timeselect option").val(2008);
+          selectizeList.timeselect.addItem(2008);
           setTimeout(function(){ callback(null); }, 500);
         },
         function(callback) {
@@ -241,12 +296,18 @@
           callback(null);
         },
         function(callback) {
-          $('#m' + 0 + ' .indiselect option').val("STKTRS ");
-          $('#m' + 1 + ' .indiselect option').val("STKMKT ");
-          $('#m' + 2 + ' .indiselect option').val(" Bonds");
-          $('#r' + 0 + ' .indiselect option').val("DirInvest");
-          $('#r' + 1 + ' .indiselect option').val("NI");
-          $('#r' + 2 + ' .indiselect option').val("IPO ");
+          // $('#m' + 0 + ' .indiselect option').val("STKTRS ");
+          // $('#m' + 1 + ' .indiselect option').val("STKMKT ");
+          // $('#m' + 2 + ' .indiselect option').val(" Bonds");
+          // $('#r' + 0 + ' .indiselect option').val("DirInvest");
+          // $('#r' + 1 + ' .indiselect option').val("NI");
+          // $('#r' + 2 + ' .indiselect option').val("IPO ");
+          selectizeList.m0.addItem("STKTRS ");
+          selectizeList.m1.addItem("STKMKT ");
+          selectizeList.m2.addItem(" Bonds");
+          selectizeList.r0.addItem("DirInvest");
+          selectizeList.r1.addItem("NI");
+          selectizeList.r2.addItem("IPO ");
           callback(null);
         },
         function(callback) {
@@ -332,7 +393,7 @@
         });
 
         // initial targetObject selectize
-        $('#targetObject').selectize({
+        var tos = $('#targetObject').selectize({
           delimiter: ',',
           persist: false,
           options: comdata.selectIndi.objectList.map( function(d){ return { item: d }; }),
@@ -345,10 +406,11 @@
             }
           }
         });
+        selectizeList.targetObject = tos[0].selectize;
 
         //  initial exObject selectize
         $('#exObject').attr("multiple","1");
-        $('#exObject').selectize({
+        var eos = $('#exObject').selectize({
           delimiter: ',',
           persist: false,
           options: comdata.selectIndi.objectList.map( function(d){ return { item: d }; }),
@@ -361,6 +423,7 @@
             }
           }
         });
+        selectizeList.exObject = eos[0].selectize;
       });
 
       // initial time when timeindi chanege
@@ -375,7 +438,7 @@
         });
 
         // initial time selectize
-        $('#timeselect').selectize({
+        var tss = $('#timeselect').selectize({
           delimiter: ',',
           persist: false,
           options: comdata.selectIndi.timeList.map( function(d){ return { item: d }; }),
@@ -388,10 +451,11 @@
             }
           }
         });
+        selectizeList.timeselect = tss[0].selectize;
       });
 
       // inital object indicator selectize
-      $('#objectIndi').selectize({
+      var ois = $('#objectIndi').selectize({
         delimiter: ',',
         persist: false,
         options: items,
@@ -404,9 +468,10 @@
           }
         }
       });
+      selectizeList.objectIndi = ois[0].selectize;
 
       // initial time indicator selectize
-      $('#timeIndi').selectize({
+      var tis = $('#timeIndi').selectize({
         delimiter: ',',
         persist: false,
         options: items,
@@ -419,13 +484,14 @@
           }
         }
       });
+      selectizeList.timeIndi = tis[0].selectize;
     }
 
     function addIndicator( type ) {
       switch (type) {
         case "market":
-          $("#" + type).append( generateIndiSelect( "m"+ comdata.selectIndi.market ) );
-          $("#m" + comdata.selectIndi.market + " .indiselect").selectize({
+          $("#" + type).append( generateIndiSelect( "m" + comdata.selectIndi.market ) );
+          var m = $("#m" + comdata.selectIndi.market + " .indiselect").selectize({
             delimiter: ',',
             persist: false,
             options: comdata.selectIndi.indiList.filter(function(i) {
@@ -440,10 +506,11 @@
               }
             }
           });
+          selectizeList["m" + comdata.selectIndi.market] = m[0].selectize;
           break;
         case "resource":
-          $("#" + type).append( generateIndiSelect( "r"+ comdata.selectIndi.resource ) );
-          $("#r" + comdata.selectIndi.resource + " .indiselect").selectize({
+          $("#" + type).append( generateIndiSelect( "r" + comdata.selectIndi.resource ) );
+          var r = $("#r" + comdata.selectIndi.resource + " .indiselect").selectize({
             delimiter: ',',
             persist: false,
             options: comdata.selectIndi.indiList.filter(function(i) {
@@ -458,6 +525,7 @@
               }
             }
           });
+          selectizeList["r" + comdata.selectIndi.resource] = r[0].selectize;
           break;
         default:
           console.log("error type : " + type);
@@ -624,6 +692,7 @@
           $( '#resultTable' ).dataTable().fnAddData(comdata.resultTable);
           nv.addGraph(function() {
             var chart = nv.models.scatterChart()
+                          .showLabels(true)
                           .showDistX(true)
                           .showDistY(true)
                           .color(d3.scale.category10().range())
@@ -635,6 +704,7 @@
             chart.yAxis
                  .axisLabel("Resource")
                  .tickFormat(d3.format('.02f'));
+
 
             d3.select('#chart svg')
                 .datum(getScatterData(comdata.result, objectIndi, comdata.targetObject))
@@ -671,7 +741,7 @@
         }
         if( i == scatterdata.length) {
           var current = {
-            values:[{}],
+            values:[{label:d[objectIndi]}],
             key:d[objectIndi]
           };
           if ( d.type == "market" ) {
