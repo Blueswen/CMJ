@@ -80,6 +80,7 @@
     <div id="chart">
       <svg></svg>
     </div>
+    <a id="download" href="#"  style="display:none"><button type="button" name="button">Download</button></a>
   </body>
   <script type="text/javascript">
     var comdata = {
@@ -99,10 +100,11 @@
       values: [],
       result: [],
       resultTable: []
-    };;
+    };
     var orgdata = [];
     var formatdata;
     var done = false;
+    var oTable;
 
     $("#loadExample").click(function(){
       $.ajax({
@@ -119,6 +121,13 @@
       addIndicator("resource");
     });
     $("#getData").click(function(){
+      if(done){
+        comdata.Mpa = 0;
+        comdata.Rpa = 0;
+        comdata.values = [];
+        comdata.result = [];
+        comdata.resultTable = [];
+      }
       var indiname = [comdata.selectIndi.objectIndi, "market", "resource"];
       var mcount = comdata.selectIndi.market;
       var rcount = comdata.selectIndi.resource;
@@ -620,18 +629,23 @@
                           .color(d3.scale.category10().range())
                           .pointRange([500,500]);
 
-            chart.xAxis.tickFormat(d3.format('.02f'));
-            chart.yAxis.tickFormat(d3.format('.02f'));
+            chart.xAxis
+                 .axisLabel("Market")
+                 .tickFormat(d3.format('.02f'));
+            chart.yAxis
+                 .axisLabel("Resource")
+                 .tickFormat(d3.format('.02f'));
 
             d3.select('#chart svg')
                 .datum(getScatterData(comdata.result, objectIndi, comdata.targetObject))
-              .transition().duration(500)
+                .transition().duration(500)
                 .call(chart);
 
             nv.utils.windowResize(chart.update);
 
             return chart;
           });
+          creatDownload();
           callback(null);
         }
       ]);
@@ -698,6 +712,33 @@
       oTable = $( '#' + tableId ).dataTable({
         "aoColumns": columns
       });
+    }
+
+    function creatDownload() {
+      var data = [];
+      var csvContent = "data:text/csv;charset=utf-8,";
+
+      data.push([comdata.selectIndi.objectIndi, "market", "resource"])
+      comdata.resultTable.forEach(function(d){
+        data.push([d[comdata.selectIndi.objectIndi], d.market, d.resource]);
+      });
+
+      console.log(data);
+
+      data.forEach(function(infoArray, index){
+         dataString = infoArray.join(",");
+         csvContent += index < data.length ? dataString+ "\n" : dataString;
+      });
+
+      var encodedUri = encodeURI(csvContent);
+      var link = $("#download");
+      link.css("display","");
+      link.attr("href", encodedUri);
+      link.attr("download", $("#timeselect option").val() + ".csv");
+
+
+
+      // link.click(); // This will download the data file named "my_data.csv".
     }
   </script>
 </html>
