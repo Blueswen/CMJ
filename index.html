@@ -43,20 +43,27 @@
         <button class="btn btn-default hide" id="quicktest" type="button" name="button">使用說明</button>
       </div>
     </div>
-    <div class="row">
+    <div class="row pad20">
       <div class="col-md-10 col-md-offset-1">
-        <table id="sourceTable" class="display pad20" cellspacing="0" width="100%">
-        </table>
+        <div class="panel panel-default" data-intro='' data-setp='5'>
+          <div class="panel-heading">
+            <span style="font-size:22px">原始資料</span>
+          </div>
+          <div class="panel-body">
+            <table id="sourceTable" class="display" cellspacing="0" width="100%">
+            </table>
+          </div>
+        </div>
       </div>
     </div>
     <div class="row">
-      <div class="col-md-10 col-md-offset-1">
-        <div class="col-md-6 pad20">
+      <div class="col-md-10 col-md-offset-1 pad20">
+        <div class="col-md-6">
           <label for="objectIndi">目標指標</label>
           <select id="objectIndi">
           </select>
         </div>
-        <div class="col-md-6 pad20">
+        <div class="col-md-6">
           <label for="timeIndi">時間指標</label>
           <select id="timeIndi">
           </select>
@@ -112,14 +119,28 @@
     </div>
     <div class="row pad20">
       <div class="col-md-10 col-md-offset-1">
-        <table id="resultTable" class="display" cellspacing="0" width="100%">
-        </table>
+        <div class="panel panel-default" data-intro='' data-setp='5'>
+          <div class="panel-heading">
+            <span style="font-size:22px">計算結果</span>
+          </div>
+          <div class="panel-body">
+            <table id="resultTable" class="display" cellspacing="0" width="100%">
+            </table>
+          </div>
+        </div>
       </div>
     </div>
     <div class="row pad20">
       <div class="col-md-10 col-md-offset-1">
-        <div id="chart">
-          <svg></svg>
+        <div class="panel panel-default" data-intro='' data-setp='5'>
+          <div class="panel-heading">
+            <span style="font-size:22px">散佈圖</span>
+          </div>
+          <div class="panel-body">
+            <div id="chart">
+              <svg></svg>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -360,7 +381,9 @@
       });
       var columns = keylist.map(function (x) { return {"mDataProp":x}; });
       oTable = $( '#' + tableId ).dataTable({
-        "aoColumns": columns
+        "aoColumns": columns,
+        "lengthChange": false,
+        "searching": false
       });
     }
 
@@ -780,7 +803,9 @@
         }
        });
       oTable = $( '#' + tableId ).dataTable({
-        "aoColumns": columns
+        "aoColumns": columns,
+        "lengthChange": false,
+        "searching": false
       });
     }
 
